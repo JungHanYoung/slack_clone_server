@@ -5,6 +5,9 @@
   "repository": "git@github.com:JungHanYoung/slack_clone_server.git",
   "author": "Hanyoung Jeong <8735132@gmail.com>",
   "license": "MIT",
+  "scripts": {
+    "start": "ts-node src/index.ts"
+  },
   "dependencies": {
     "graphql-yoga": "^1.13.1",
     "pg": "^7.4.2",
