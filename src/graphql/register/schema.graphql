@@ -1,7 +1,32 @@
+scalar Date
+
+type User {
+    id: String
+    email: String
+    confirmed: Boolean
+    createdAt: Date
+    updatedAt: Date
+}
+
+type Error {
+    path: String!
+    message: String!
+}
+
+type LoginResponse {
+    ok: Boolean
+    token: String
+    refreshToken: String
+    errors: [Error!]
+}
+
 type Query {
     hello: String
+    allUsers: [User!]
+    getUser(id: String!): User!
 }
 
 type Mutation {
     register(email: String!, password: String!): Boolean!
+    login(email: String!, password: String!): LoginResponse!
 }
