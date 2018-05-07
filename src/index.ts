@@ -1,38 +1,23 @@
 import { GraphQLServer } from "graphql-yoga";
-import { User } from "./entity/User";
 import { createConnection } from "typeorm";
 
-const typeDefs = `
-    type Query {
-        hello: String
-    }
+import { makeExecutableSchema, mergeSchemas } from "graphql-tools";
+import { importSchema } from "graphql-import";
+import { GraphQLSchema } from "graphql";
+import * as fs from 'fs';
+import * as path from 'path';
 
-    type Mutation {
-        register(email: String!, password: String!): Boolean!
-    }
-`;
+const schemas: GraphQLSchema[] = [];
+const folders = fs.readdirSync(path.join(__dirname, './graphql'));
+folders.forEach(folder => {
+    const { resolvers } = require(`./graphql/${folder}/resolvers`);
+    const typeDefs = importSchema(path.join(__dirname, `./graphql/${folder}/schema.graphql`));
+    schemas.push(
+        makeExecutableSchema({ typeDefs, resolvers })
+    );
+});
 
-const resolvers = {
-    Query: {
-        hello: () => 'hi'
-    },
-    Mutation: {
-        register: async (_: any, args: any) => {
-            try {
-                await User.create({
-                    email: args.email,
-                    password: args.password
-                }).save();
-                return true;
-            } catch(err) {
-                console.log(err);
-                return false;
-            }
-        }
-    }
-}
-
-const server = new GraphQLServer({ typeDefs, resolvers });
+const server = new GraphQLServer({ schema: mergeSchemas({ schemas }) });
 
 createConnection().then(() => {
     server.start({ port: 4000 }).then(() => {
